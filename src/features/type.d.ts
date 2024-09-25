@@ -1,4 +1,4 @@
-export enum Feature {
+export enum FeatureEnums {
   Enterprise = "enterprise",
   Community = "community",
   Premium = "premium",

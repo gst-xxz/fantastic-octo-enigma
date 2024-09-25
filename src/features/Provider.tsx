@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState } from "react";
 import { IFeature } from "./type";
 import { fetchFeature } from "../api";
-import lodash from "lodash";
-import { featureHelper } from ".";
+import { featureManager } from ".";
 
-export const FeaturesContext = createContext<IFeature>(featureHelper.feature);
+export const FeaturesContext = createContext<IFeature>(featureManager.feature);
 
 export const FeaturesProvider = ({
   children,
@@ -12,13 +11,13 @@ export const FeaturesProvider = ({
   children: React.ReactNode;
 }) => {
   const [innerFeature, setInnerFeature] = useState<IFeature>(
-    featureHelper.feature
+    featureManager.feature
   );
 
   React.useEffect(() => {
     // 从后端获取 feature, 合并前端定义的 feature
     fetchFeature().then((newFeature) =>
-      setInnerFeature((prevFeature) => lodash.merge(prevFeature, newFeature))
+      setInnerFeature(featureManager.mergeFeature(newFeature))
     );
   }, []);
 

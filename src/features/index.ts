@@ -1,22 +1,25 @@
 import { community } from "./config/community";
 import { enterprise } from "./config/enterprise";
 import { premiumFeatures } from "./config/premium";
-import { Feature } from "./type.d";
+import { FeatureEnums, IFeature } from "./type.d";
+import lodash from "lodash";
 
-class FeatureHelper {
-  get env() {
+class FeatureManager {
+  private get env() {
     console.log(process.env.FEATURE);
-    return (process.env.FEATURE ?? Feature.Enterprise) as Feature;
+    return (process.env.FEATURE ?? FeatureEnums.Enterprise) as FeatureEnums;
   }
+
   get isEnterprise() {
-    return this.env === Feature.Enterprise;
+    return this.env === FeatureEnums.Enterprise;
   }
 
   get isCommunity() {
-    return this.env === Feature.Community;
+    return this.env === FeatureEnums.Community;
   }
+
   get isPremium() {
-    return this.env === Feature.Premium;
+    return this.env === FeatureEnums.Premium;
   }
 
   get name() {
@@ -30,7 +33,7 @@ class FeatureHelper {
     return "Enterprise";
   }
 
-  get feature() {
+  private get localFeatures() {
     if (this.isCommunity) {
       return community;
     }
@@ -40,6 +43,16 @@ class FeatureHelper {
 
     return enterprise;
   }
+
+  // 融合本地 feature 和后端 feature
+  public feature: IFeature = this.localFeatures;
+
+  public mergeFeature(feature: Partial<IFeature>) {
+    // todo 还可以根据业务，处理不同 feature 的优先级
+    this.feature = lodash.merge(this.localFeatures, feature);
+
+    return this.feature;
+  }
 }
 
-export const featureHelper = new FeatureHelper();
+export const featureManager = new FeatureManager();
